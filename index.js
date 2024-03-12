@@ -1,42 +1,46 @@
-import { program } from 'commander';
-import * as contactsService from './contacts.js';
-
+const contacts = require("./contacts");
+const { Command } = require("commander");
+const program = new Command();
 program
-  .option('-a, --action <type>', 'choose action')
-  .option('-i, --id <type>', 'user id')
-  .option('-n, --name <type>', 'user name')
-  .option('-e, --email <type>', 'user email')
-  .option('-p, --phone <type>', 'user phone');
+  .option("-a, --action <type>", "choose action")
+  .option("-i, --id <type>", "user id")
+  .option("-n, --name <type>", "user name")
+  .option("-e, --email <type>", "user email")
+  .option("-p, --phone <type>", "user phone");
 
-program.parse();
+program.parse(process.argv);
 
-const options = program.opts();
+const argv = program.opts();
 
+// TODO: рефакторити
 async function invokeAction({ action, id, name, email, phone }) {
   switch (action) {
-    case 'list':
-      const allContacts = await contactsService.listContacts();
-      console.log(allContacts);
+    case "list":
+      const allContacts = await contacts.listContacts();
+      return console.log(allContacts);
       break;
 
-    case 'get':
-      const contactById = await contactsService.getContactById(id);
-      console.log(contactById);
+    case "get":
+      // ... id
+      const oneContact = await contacts.getContactById(id);
+      return console.log(oneContact);
       break;
 
-    case 'add':
-      const newContact = await contactsService.addContact({ name, email, phone });
-      console.log(newContact);
+    case "add":
+      // ... name email phone
+      const addCont = await contacts.addContact(name, email, phone);
+      return console.log(addCont);
       break;
 
-    case 'remove':
-      const deleteContact = await contactsService.removeContact(id);
-      console.log(deleteContact);
+    case "remove":
+      // ... id
+      const remove = await contacts.removeContact(id);
+      return console.log(remove);
       break;
 
     default:
-      console.warn('\x1B[31m Unknown action type!');
+      console.warn("\x1B[31m Unknown action type!");
   }
 }
 
-invokeAction(options);
+invokeAction(argv);
